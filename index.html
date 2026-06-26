@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Screen Image Viewer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            width: 100%;
+            height: 100vh;
+            display: block;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #fff;
+            overflow: hidden;
+        }
+
+        /* Centering container using traditional table-like behavior or block centering */
+        .wrapper {
+            display: table;
+            width: 100%;
+            height: 100%;
+        }
+
+        .cell {
+            display: table-cell;
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        /* Upload Box Styling (Glassmorphism Effect) */
+        .upload-container {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .upload-container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 400;
+        }
+
+        #imageInput {
+            display: none;
+        }
+
+        .custom-upload-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: #2563eb;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .custom-upload-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+        }
+
+        /* Full Screen Overlay */
+        .fullscreen-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            display: none;
+            z-index: 999;
+        }
+
+        .fullscreen-overlay.active {
+            display: table;
+        }
+
+        /* Image scaling to cover full screen nicely */
+        .fullscreen-overlay img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        /* Close Button */
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            font-size: 40px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            z-index: 1000;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper" id="uploadBoxWrapper">
+        <div class="cell">
+            <!-- File Upload Container -->
+            <div class="upload-container" id="uploadBox">
+                <h2>ඔබේ පින්තූරය තෝරන්න</h2>
+                <label for="imageInput" class="custom-upload-btn">Choose Image</label>
+                <input type="file" id="imageInput" accept="image/*">
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Screen Image Preview Overlay -->
+    <div class="fullscreen-overlay" id="fullscreenOverlay">
+        <div class="close-btn" id="closeBtn">&times;</div>
+        <div class="cell">
+            <img src="" alt="Full Screen Preview" id="previewImage">
+        </div>
+    </div>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const fullscreenOverlay = document.getElementById('fullscreenOverlay');
+        const previewImage = document.getElementById('previewImage');
+        const closeBtn = document.getElementById('closeBtn');
+        const uploadBox = document.getElementById('uploadBox');
+
+        imageInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            
+            if (file) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    fullscreenOverlay.classList.add('active');
+                    uploadBox.style.opacity = '0';
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        });
+
+        closeBtn.addEventListener('click', closePreview);
+        fullscreenOverlay.addEventListener('click', function(e) {
+            if (e.target !== previewImage && e.target !== closeBtn) {
+                closePreview();
+            }
+        });
+
+        function closePreview() {
+            fullscreenOverlay.classList.remove('active');
+            uploadBox.style.opacity = '1';
+            imageInput.value = '';
+        }
+    </script>
+</body>
+</html>
